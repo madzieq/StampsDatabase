@@ -1,2 +1,0 @@
-# StampsDatabase
-Polish Stamps Database
