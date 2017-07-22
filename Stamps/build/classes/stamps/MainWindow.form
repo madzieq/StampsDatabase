@@ -183,7 +183,7 @@
         <Component class="javax.swing.JButton" name="jButton_Add">
           <Properties>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="3" name="/stamps/add.png"/>
+              <Image iconType="3" name="/stamps/addIcon.png"/>
             </Property>
             <Property name="text" type="java.lang.String" value=" ADD"/>
           </Properties>
@@ -194,7 +194,7 @@
         <Component class="javax.swing.JButton" name="jButton_Edit">
           <Properties>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="3" name="/stamps/update.png"/>
+              <Image iconType="3" name="/stamps/updateIcon.png"/>
             </Property>
             <Property name="text" type="java.lang.String" value="  EDIT"/>
           </Properties>
@@ -205,7 +205,7 @@
         <Component class="javax.swing.JButton" name="jButton_Delete">
           <Properties>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="3" name="/stamps/remove.png"/>
+              <Image iconType="3" name="/stamps/removeIcon.png"/>
             </Property>
             <Property name="text" type="java.lang.String" value="  DELETE"/>
           </Properties>
@@ -218,7 +218,7 @@
     <Component class="javax.swing.JButton" name="jButton_RefreshView">
       <Properties>
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-          <Image iconType="3" name="/stamps/update.png"/>
+          <Image iconType="3" name="/stamps/updateIcon.png"/>
         </Property>
       </Properties>
       <Events>

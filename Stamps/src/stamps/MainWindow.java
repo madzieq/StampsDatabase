@@ -51,7 +51,7 @@ public class MainWindow extends javax.swing.JFrame {
     public TheModel populateJTable() throws SQLException, FileNotFoundException {
         Database.getConnection();
         Database db = new Database();
-        ArrayList<Stamp> list = db.getDataToTable();  
+        ArrayList<Stamp> list = db.getStampsFromDB();  
         Object[][] rows = new Object[list.size()][8];
         
         //Input stamps' images to Jtable
@@ -127,7 +127,7 @@ public class MainWindow extends javax.swing.JFrame {
         jTable_Stamps.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
         jScrollPane1.setViewportView(jTable_Stamps);
 
-        jButton_Add.setIcon(new javax.swing.ImageIcon(getClass().getResource("/stamps/add.png"))); // NOI18N
+        jButton_Add.setIcon(new javax.swing.ImageIcon(getClass().getResource("/stamps/addIcon.png"))); // NOI18N
         jButton_Add.setText(" ADD");
         jButton_Add.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -135,7 +135,7 @@ public class MainWindow extends javax.swing.JFrame {
             }
         });
 
-        jButton_Edit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/stamps/update.png"))); // NOI18N
+        jButton_Edit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/stamps/updateIcon.png"))); // NOI18N
         jButton_Edit.setText("  EDIT");
         jButton_Edit.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -143,7 +143,7 @@ public class MainWindow extends javax.swing.JFrame {
             }
         });
 
-        jButton_Delete.setIcon(new javax.swing.ImageIcon(getClass().getResource("/stamps/remove.png"))); // NOI18N
+        jButton_Delete.setIcon(new javax.swing.ImageIcon(getClass().getResource("/stamps/removeIcon.png"))); // NOI18N
         jButton_Delete.setText("  DELETE");
         jButton_Delete.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -175,7 +175,7 @@ public class MainWindow extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        jButton_RefreshView.setIcon(new javax.swing.ImageIcon(getClass().getResource("/stamps/update.png"))); // NOI18N
+        jButton_RefreshView.setIcon(new javax.swing.ImageIcon(getClass().getResource("/stamps/updateIcon.png"))); // NOI18N
         jButton_RefreshView.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton_RefreshViewActionPerformed(evt);
@@ -221,7 +221,7 @@ public class MainWindow extends javax.swing.JFrame {
             public void run() {                
                 try {
                     //Create new window for adding new record to database
-                    new AddRecordWindow().setVisible(true);  
+                    new AddWindow().setVisible(true);  
                 } catch (Exception ex) {
                     System.out.println(ex);
                 }
@@ -256,7 +256,29 @@ public class MainWindow extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton_RefreshViewActionPerformed
 
     private void jButton_EditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_EditActionPerformed
-        //not implemented yet :)
+        int[] selection = jTable_Stamps.getSelectedRows();
+        TheModel model = null;
+        
+        try {
+            for (int i = 0; i < selection.length; i++) {
+                selection[i] = jTable_Stamps.convertRowIndexToModel(selection[i]);
+            }
+            int row = selection[0]+1;  //number of choosen row to update
+            Database.setSelected(row);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(null, "Please select row to update.");
+        }
+        
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {                
+                try {
+                    //Create new window for adding new record to database
+                    new UpdateWindow().setVisible(true);  
+                } catch (Exception ex) {
+                    System.out.println(ex);
+                }
+            }    
+        }) ;
     }//GEN-LAST:event_jButton_EditActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

@@ -31,7 +31,7 @@ public class Database {
     final static String password = "root27"; 
     static Connection connection = null;
     final static String[] columnNames = {"Catalog nr", "Image", "Name", "Unit", "Release date", "Production", "In collection", "Stamped"};
-
+    static int selected = -1;
     
     public static void getConnection() throws SQLException, FileNotFoundException {
         try {
@@ -42,10 +42,42 @@ public class Database {
             ex.printStackTrace();
         }   
     }
-
     
-    public static ArrayList<Stamp> getDataToTable() {
+    public static void setSelected(int row) {
+        selected = row;
+    }
+    
+    public static int getSelected() {
+        return selected;
+    }
+    
+    public static Stamp getSelectedStampValues() {
+        String query = "SELECT NR, PHOTO, NAME, UNIT, RELEASE_DATE, PRODUCTION, IN_COLLECTION, STAMPED FROM stampspl WHERE NR = " + selected;
+        Statement st;
+        ResultSet rs;
+        Stamp stamp = null;
+        try {
+            st = connection.createStatement();
+            rs = st.executeQuery(query);
+            while (rs.next()) {
+                stamp = new Stamp(rs.getInt("NR"), 
+                        rs.getBytes("PHOTO"), 
+                        rs.getString("NAME"), 
+                        rs.getString("UNIT"), 
+                        rs.getDate("RELEASE_DATE"), 
+                        rs.getLong("PRODUCTION"), 
+                        rs.getBoolean("IN_COLLECTION"), 
+                        rs.getBoolean("STAMPED"));
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
         
+        return stamp;
+    }
+    
+
+    public static ArrayList<Stamp> getStampsFromDB() {       
         ArrayList<Stamp> stampsList = new ArrayList<Stamp>();
         String query = "SELECT NR, PHOTO, NAME, UNIT, RELEASE_DATE, PRODUCTION, IN_COLLECTION, STAMPED FROM stampspl";
         Statement st;
@@ -74,14 +106,13 @@ public class Database {
     }
        
     
-    static java.sql.Date convertDate(java.util.Date date) {
+    public static java.sql.Date convertDate(java.util.Date date) {
         java.sql.Date sqlDate = new java.sql.Date(date.getTime());
         return sqlDate;
     }
         
     
-    public static int addRecord(Stamp st) throws SQLException, FileNotFoundException {
-                  
+    public static int addRecord(Stamp st) throws SQLException, FileNotFoundException {                 
         File image = st.getPhotoFile();
         FileInputStream fis = new FileInputStream(image);
         PreparedStatement psmnt;
@@ -117,9 +148,60 @@ public class Database {
         }
         return s;
     }
+    
+    
+    public static int updateRecord(Stamp stampBefore, Stamp stampAfter) throws FileNotFoundException, SQLException {
+        File image = null;
+        FileInputStream fis = null;
+        PreparedStatement psmnt;
+        String query;
+        int s;
+        int n = 8;
+        
+        if (stampAfter.getPhotoFile() != null) {
+            image = stampAfter.getPhotoFile();
+            fis = new FileInputStream(image);
+            query = "update stampspl SET NR=?, NAME=?, UNIT=?, RELEASE_DATE=?, PRODUCTION=?, IN_COLLECTION=?, STAMPED=?, PHOTO=? WHERE NR = ?";
+            n = 9;
+        } else {
+            query = "update stampspl SET NR=?, NAME=?, UNIT=?, RELEASE_DATE=?, PRODUCTION=?, IN_COLLECTION=?, STAMPED=? WHERE NR = ?";
+        }
+
+        //update the row 
+        psmnt = connection.prepareStatement(query);
+        psmnt.setInt(1,stampAfter.getCatalogNr());
+        psmnt.setString(2, stampAfter.getName());
+        psmnt.setString(3, stampAfter.getUnit());
+        psmnt.setDate(4, convertDate(stampAfter.getReleaseDate()));
+        psmnt.setLong(5, stampAfter.getProduction());
+        psmnt.setInt(n, stampBefore.getCatalogNr());
+        if (n == 9)
+            psmnt.setBinaryStream(8, (InputStream)fis, (int)(image.length()));
+        
+        if (stampAfter.getInCollection()==true)
+            psmnt.setInt(6, 1);
+        else
+            psmnt.setInt(6, 0);
+        if (stampAfter.getStamped()==true)
+            psmnt.setInt(7, 1);
+        else
+            psmnt.setInt(7, 0);
+        
+        try {
+            s = psmnt.executeUpdate();
+        }
+        catch (Exception e) {
+            String doubleNr = "Duplicate entry '" + stampAfter.getCatalogNr() + "' for key 'PRIMARY'";
+            if (e.getMessage().equals(doubleNr))
+                s = -2;
+            else
+                s = 0;
+        }
+        return s;    
+    }
 
     
-    static String removeRecord(int row, TheModel model) throws SQLException, FileNotFoundException {
+    public static String removeRecord(int row, TheModel model) throws SQLException, FileNotFoundException {
         String selected = model.getValueAt(row, 0).toString();
         String query = "DELETE FROM stampspl WHERE NR = " + selected;
         String info;
