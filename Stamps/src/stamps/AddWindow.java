@@ -228,15 +228,22 @@ public class AddWindow extends javax.swing.JFrame{
         } 
     }
         
-    private void addNewRecord() throws SQLException, FileNotFoundException{    
-        File image = new File(jTextField_PhotoPath.getText());
+    private void addNewRecord() throws SQLException, FileNotFoundException{ 
         Stamp stamp = new Stamp();
+        
+        try {
+            File image = new File(jTextField_PhotoPath.getText());
+            stamp.setPhotoFile(image);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
         int day = jComboBox_Day.getSelectedIndex()+1;
         int month = jComboBox_Month.getSelectedIndex()+1;
         int year = Integer.parseInt(jTextField_Year.getText());
                 
         stamp.setCatalogNr(Integer.parseInt(jTextField_Nr.getText()));
-        stamp.setPhotoFile(image);
+        //stamp.setPhotoFile(image);
         stamp.setName(jTextField_Name.getText());
         stamp.setUnit(jTextField_Unit.getText());
         stamp.setReleaseDate(day, month, year);     
@@ -266,7 +273,6 @@ public class AddWindow extends javax.swing.JFrame{
         int rVal = fc.showOpenDialog(AddWindow.this);
         
         if (rVal == JFileChooser.APPROVE_OPTION) {
-            //stamp.setPhoto(selectedFile);
             jTextField_PhotoPath.setText(fc.getCurrentDirectory().toString()+"\\"+fc.getSelectedFile().getName());
         }
     }//GEN-LAST:event_jButton_ChoosePhotoActionPerformed

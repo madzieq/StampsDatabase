@@ -259,11 +259,14 @@ public class MainWindow extends javax.swing.JFrame {
         int[] selection = jTable_Stamps.getSelectedRows();
         TheModel model = null;
         
+        for (int i = 0; i < selection.length; i++) {
+            selection[i] = jTable_Stamps.convertRowIndexToModel(selection[i]);
+        }
+        int row = selection[0];
+        
         try {
-            for (int i = 0; i < selection.length; i++) {
-                selection[i] = jTable_Stamps.convertRowIndexToModel(selection[i]);
-            }
-            int row = selection[0]+1;  //number of choosen row to update
+            model = populateJTable();
+            Database.setModel(model);
             Database.setSelected(row);
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(null, "Please select row to update.");

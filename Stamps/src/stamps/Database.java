@@ -32,6 +32,7 @@ public class Database {
     static Connection connection = null;
     final static String[] columnNames = {"Catalog nr", "Image", "Name", "Unit", "Release date", "Production", "In collection", "Stamped"};
     static int selected = -1;
+    static TheModel model;
     
     public static void getConnection() throws SQLException, FileNotFoundException {
         try {
@@ -51,8 +52,17 @@ public class Database {
         return selected;
     }
     
+    public static void setModel(TheModel m) {
+        model = m;
+    }
+    
+    public static TheModel getModel() {
+        return model;
+    }
+    
     public static Stamp getSelectedStampValues() {
-        String query = "SELECT NR, PHOTO, NAME, UNIT, RELEASE_DATE, PRODUCTION, IN_COLLECTION, STAMPED FROM stampspl WHERE NR = " + selected;
+        String selectedNr = model.getValueAt(selected, 0).toString();
+        String query = "SELECT NR, PHOTO, NAME, UNIT, RELEASE_DATE, PRODUCTION, IN_COLLECTION, STAMPED FROM stampspl WHERE NR = " + selectedNr;
         Statement st;
         ResultSet rs;
         Stamp stamp = null;
@@ -112,16 +122,24 @@ public class Database {
     }
         
     
-    public static int addRecord(Stamp st) throws SQLException, FileNotFoundException {                 
-        File image = st.getPhotoFile();
-        FileInputStream fis = new FileInputStream(image);
+    public static int addRecord(Stamp st) throws SQLException, FileNotFoundException {  
         PreparedStatement psmnt;
+        FileInputStream fis = null;
         int s;
 
         //add new row: information about stamp and photo
         psmnt = connection.prepareStatement("insert into stampspl(NR, PHOTO, NAME, UNIT, RELEASE_DATE, PRODUCTION, IN_COLLECTION, STAMPED) " + "values(?,?,?,?,?,?,?,?)");
         psmnt.setInt(1,st.getCatalogNr());
-        psmnt.setBinaryStream(2, (InputStream)fis, (int)(image.length()));
+        
+        try {
+            File image = st.getPhotoFile();
+            System.out.println(image);
+            fis = new FileInputStream(image);
+            psmnt.setBinaryStream(2, (InputStream)fis, (int)(image.length()));
+        } catch (Exception ex) {
+            psmnt.setBinaryStream(2, null);
+        }
+        
         psmnt.setString(3, st.getName());
         psmnt.setString(4, st.getUnit());
         psmnt.setDate(5, convertDate(st.getReleaseDate()));
@@ -202,8 +220,8 @@ public class Database {
 
     
     public static String removeRecord(int row, TheModel model) throws SQLException, FileNotFoundException {
-        String selected = model.getValueAt(row, 0).toString();
-        String query = "DELETE FROM stampspl WHERE NR = " + selected;
+        String selectedNr = model.getValueAt(row, 0).toString();
+        String query = "DELETE FROM stampspl WHERE NR = " + selectedNr;
         String info;
         Database.getConnection();
         try {
