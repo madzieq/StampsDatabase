@@ -133,7 +133,6 @@ public class Database {
         
         try {
             File image = st.getPhotoFile();
-            System.out.println(image);
             fis = new FileInputStream(image);
             psmnt.setBinaryStream(2, (InputStream)fis, (int)(image.length()));
         } catch (Exception ex) {

@@ -20,10 +20,13 @@ import javax.swing.JOptionPane;
 
 public class AddWindow extends javax.swing.JFrame{
     
-    public AddWindow() {
+    private MainWindow mainWindow;
+    
+    public AddWindow(MainWindow main) throws SQLException, FileNotFoundException {
         Image icon = new ImageIcon(this.getClass().getResource("add.png")).getImage();
         this.setTitle("Add new record");
         this.setIconImage(icon);
+        mainWindow = main;
         initComponents();
     }
 
@@ -243,7 +246,6 @@ public class AddWindow extends javax.swing.JFrame{
         int year = Integer.parseInt(jTextField_Year.getText());
                 
         stamp.setCatalogNr(Integer.parseInt(jTextField_Nr.getText()));
-        //stamp.setPhotoFile(image);
         stamp.setName(jTextField_Name.getText());
         stamp.setUnit(jTextField_Unit.getText());
         stamp.setReleaseDate(day, month, year);     
@@ -264,7 +266,8 @@ public class AddWindow extends javax.swing.JFrame{
         }
         catch (Exception ex) {
             ex.printStackTrace();   
-        }       
+        }      
+        mainWindow.refreshJTable();
     }//GEN-LAST:event_jButton_AddNewRecordActionPerformed
 
     

@@ -13,6 +13,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
+import javax.swing.SwingConstants;
+import javax.swing.table.DefaultTableCellRenderer;
 
 /**
  *
@@ -24,11 +26,14 @@ import javax.swing.JOptionPane;
 
 public class MainWindow extends javax.swing.JFrame {
 
+    MainWindow main;
+    
     //Creates new form GUI
     public MainWindow() throws SQLException, FileNotFoundException {
         Image icon = new ImageIcon(this.getClass().getResource("stamp.png")).getImage();
         this.setTitle("Polish stamps database");
         this.setIconImage(icon);
+        this.main = this;
         initComponents();
         populateJTable();
     }
@@ -49,6 +54,8 @@ public class MainWindow extends javax.swing.JFrame {
     
     //Input data from database to Jtable
     public TheModel populateJTable() throws SQLException, FileNotFoundException {
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+        centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
         Database.getConnection();
         Database db = new Database();
         ArrayList<Stamp> list = db.getStampsFromDB();  
@@ -77,9 +84,19 @@ public class MainWindow extends javax.swing.JFrame {
         
         TheModel model = new TheModel(rows, Database.columnNames);
         jTable_Stamps.setModel(model);
-        jTable_Stamps.setRowHeight(80);
-        jTable_Stamps.getColumnModel().getColumn(4).setPreferredWidth(50);
-        jTable_Stamps.setRowMargin(4);
+        jTable_Stamps.setRowHeight(110);
+        jTable_Stamps.getColumnModel().getColumn(0).setPreferredWidth(15);
+        jTable_Stamps.getColumnModel().getColumn(1).setPreferredWidth(150);
+        jTable_Stamps.getColumnModel().getColumn(4).setPreferredWidth(60);
+        jTable_Stamps.getColumnModel().getColumn(6).setPreferredWidth(40);
+        jTable_Stamps.getColumnModel().getColumn(7).setPreferredWidth(40);
+        jTable_Stamps.setRowMargin(5);
+        
+        for(int i=0; i<6; i++){
+            if (i==2) {}
+            else 
+                jTable_Stamps.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+        }
         
         return model;
     }
@@ -96,9 +113,13 @@ public class MainWindow extends javax.swing.JFrame {
         jButton_Add = new javax.swing.JButton();
         jButton_Edit = new javax.swing.JButton();
         jButton_Delete = new javax.swing.JButton();
-        jButton_RefreshView = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
 
         jLabel1.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
         jLabel1.setText("Polish Stamps Database");
@@ -111,7 +132,7 @@ public class MainWindow extends javax.swing.JFrame {
 
             },
             new String [] {
-                "Catalog nr", "Name", "Photo", "Unit", "Release date", "Production", "In collection", "Stamped"
+                "Nr", "Name", "Photo", "Unit", "Release date", "Production", "In collection", "Stamped"
             }
         ) {
             Class[] types = new Class [] {
@@ -175,13 +196,6 @@ public class MainWindow extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        jButton_RefreshView.setIcon(new javax.swing.ImageIcon(getClass().getResource("/stamps/updateIcon.png"))); // NOI18N
-        jButton_RefreshView.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton_RefreshViewActionPerformed(evt);
-            }
-        });
-
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -192,8 +206,7 @@ public class MainWindow extends javax.swing.JFrame {
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 192, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(282, 282, 282)
-                        .addComponent(jButton_RefreshView, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(324, 324, 324))
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jScrollPane1))
                 .addContainerGap())
@@ -202,10 +215,8 @@ public class MainWindow extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGap(22, 22, 22)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel1)
-                    .addComponent(jButton_RefreshView))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 16, Short.MAX_VALUE)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 283, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(31, 31, 31)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -221,7 +232,7 @@ public class MainWindow extends javax.swing.JFrame {
             public void run() {                
                 try {
                     //Create new window for adding new record to database
-                    new AddWindow().setVisible(true);  
+                    new AddWindow(main).setVisible(true);  
                 } catch (Exception ex) {
                     System.out.println(ex);
                 }
@@ -247,14 +258,6 @@ public class MainWindow extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jButton_DeleteActionPerformed
 
-    private void jButton_RefreshViewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_RefreshViewActionPerformed
-        try {
-            refreshJTable();
-        } catch (SQLException | FileNotFoundException ex) {
-            Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }//GEN-LAST:event_jButton_RefreshViewActionPerformed
-
     private void jButton_EditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_EditActionPerformed
         int[] selection = jTable_Stamps.getSelectedRows();
         TheModel model = null;
@@ -276,7 +279,7 @@ public class MainWindow extends javax.swing.JFrame {
             public void run() {                
                 try {
                     //Create new window for adding new record to database
-                    new UpdateWindow().setVisible(true);  
+                    new UpdateWindow(main).setVisible(true);                   
                 } catch (Exception ex) {
                     System.out.println(ex);
                 }
@@ -284,11 +287,14 @@ public class MainWindow extends javax.swing.JFrame {
         }) ;
     }//GEN-LAST:event_jButton_EditActionPerformed
 
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        Database.closeConnection();
+    }//GEN-LAST:event_formWindowClosing
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton_Add;
     private javax.swing.JButton jButton_Delete;
     private javax.swing.JButton jButton_Edit;
-    private javax.swing.JButton jButton_RefreshView;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;

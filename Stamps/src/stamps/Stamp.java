@@ -103,7 +103,6 @@ public class Stamp {
     public void setReleaseDate(int day, int month, int year) {
         GregorianCalendar relDate = new GregorianCalendar(year, month - 1, day);
         this.releaseDate = relDate.getTime();
-        System.out.println(releaseDate);
     }
     
     public Date getReleaseDate() {
